@@ -6,12 +6,12 @@ namespace ContosoUniversity.Data
 {
 	public static class DbInitializer
 	{
-		public static void Initialize(SchoolContext context)
+		public static void Initialize(UniversityContext context)
 		{
 			context.Database.EnsureCreated();
 
 			// Look for any students.
-			if (context.Students.Any())
+			if (context.Enrollments.Any())
 			{
 				return;   // DB has been seeded
 			}
@@ -27,11 +27,11 @@ namespace ContosoUniversity.Data
 			new Student{FirstName="Laura",LastName="Norman",EnrollmentDate=DateTime.Parse("2003-09-01")},
 			new Student{FirstName="Nino",LastName="Olivetto",EnrollmentDate=DateTime.Parse("2005-09-01")}
 			};
-			foreach (Student s in students)
-			{
-				context.Students.Add(s);
-			}
-			context.SaveChanges();
+			//foreach (Student s in students)
+			//{
+			//	context.Students.Add(s);
+			//}
+			//context.SaveChanges();
 
 			var courses = new Course[]
 			{
@@ -43,11 +43,11 @@ namespace ContosoUniversity.Data
 			new Course{CourseID=2021,Title="Composition",Credits=3},
 			new Course{CourseID=2042,Title="Literature",Credits=4}
 			};
-			foreach (Course c in courses)
-			{
-				context.Courses.Add(c);
-			}
-			context.SaveChanges();
+			//foreach (Course c in courses)
+			//{
+			//	context.Courses.Add(c);
+			//}
+			//context.SaveChanges();
 
 			var enrollments = new Enrollment[]
 			{

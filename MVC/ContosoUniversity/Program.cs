@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder
@@ -27,6 +27,19 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+
+IServiceScope scope = app.Services.CreateScope();
+IServiceProvider services = scope.ServiceProvider;
+
+
+	var context= services.GetRequiredService<UniversityContext>();
+	DbInitializer.Initialize(context);
+
+
+
+
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
