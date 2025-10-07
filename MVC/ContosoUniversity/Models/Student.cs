@@ -8,9 +8,10 @@ namespace ContosoUniversity.Models
 		public int ID { get; set; }
 		public string LastName { get; set; }
 		public string FirstName { get; set; }
-		public DateTime EnrollmentDate { get; set; }	//Дата поступления
+		public DateTime EnrollmentDate { get; set; }    //Дата поступления
 
-		//Navigation property:
-		public ICollection<Enrollment> Enrollments { get; set; }
-	}
+        //Navigation property:
+        public ICollection<Enrollment> Enrollments { get; set; } 
+
+    }
 }

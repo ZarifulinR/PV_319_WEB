@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
+//using System.Data.Entity;
 
 namespace ContosoUniversity.Controllers
 {
@@ -20,11 +21,33 @@ namespace ContosoUniversity.Controllers
         }
 
         // GET: Students
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string saerchString)
         {
-            return View(await _context.Students.ToListAsync());
-        }
+            ViewData["NameSotrParam"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DataSortParam"] = sortOrder == "date" ? "date_desc" : "date";
 
+            ViewData["CurrentFilter"] = saerchString;
+
+            IQueryable<Student> students = from s in _context.Students select s;
+            //var students = from s in _context.Students select s;
+
+            if (!String.IsNullOrEmpty(saerchString))
+            {
+                students = students.Where(s => s.LastName.Contains(saerchString) || s.FirstName.Contains(saerchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc": students = students.OrderByDescending(s => s.LastName); break;
+                case "date": students = students.OrderBy(s => s.EnrollmentDate); break;
+                case "date_desc": students = students.OrderByDescending(s => s.EnrollmentDate); break;
+                default: students = students.OrderBy(s => s.LastName); break;
+            }
+            return View(await students.AsNoTracking().ToListAsync());
+        }
+            //return View(await _context.Students.ToListAsync());
+        
+
+        // GET: Students/Details/5
         // GET: Students/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -34,7 +57,11 @@ namespace ContosoUniversity.Controllers
             }
 
             var student = await _context.Students
+                .Include(s => s.Enrollments)        // загружаем связи
+                    .ThenInclude(e => e.Course)     // и связанные курсы
+                .AsNoTracking()                     // ускоряет чтение, если редактирование не нужно
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             if (student == null)
             {
                 return NotFound();
@@ -42,8 +69,6 @@ namespace ContosoUniversity.Controllers
 
             return View(student);
         }
-
-        // GET: Students/Create
         public IActionResult Create()
         {
             return View();
@@ -124,8 +149,14 @@ namespace ContosoUniversity.Controllers
                 return NotFound();
             }
 
+            //var student = await _context.Students
+            //    .FirstOrDefaultAsync(m => m.ID == id);
+
             var student = await _context.Students
-                .FirstOrDefaultAsync(m => m.ID == id);
+                  .Include(s => s.Enrollments)
+                  .ThenInclude(e => e.Course)
+                  .AsNoTracking()
+                  .FirstOrDefaultAsync(m => m.ID == id);
             if (student == null)
             {
                 return NotFound();
